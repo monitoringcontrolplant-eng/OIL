@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oil Monitoring System - Management Dashboard</title>
+    <title>Oil Monitoring System - Pro Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS for Excel Export/Import -->
@@ -15,31 +15,31 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
 
     <!-- Header / Navbar -->
-    <header class="bg-slate-900 text-white shadow-md">
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2.5 rounded-lg text-white">
+                <div class="bg-blue-500 p-2.5 rounded-xl text-slate-950 font-bold shadow-md">
                     <i class="fa-solid fa-oil-can text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">OIL MONITORING SYSTEM</h1>
-                    <p class="text-xs text-slate-400">Management Dashboard & Tracking</p>
+                    <h1 class="text-xl font-bold tracking-wide text-white">OIL MONITORING PRO</h1>
+                    <p class="text-xs text-slate-400">Management Cloud System & Spreadsheet Sync</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <button onclick="refreshData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-md font-medium border border-slate-700 transition flex items-center gap-1.5">
+                <button onclick="refreshData()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3.5 py-2 rounded-lg font-medium border border-slate-600 transition flex items-center gap-2 text-slate-200">
                     <i class="fa-solid fa-rotate text-blue-400" id="refresh-icon"></i> Refresh Data
                 </button>
-                <button onclick="clearLocalCache()" class="bg-rose-900/60 hover:bg-rose-800 text-xs px-3 py-2 rounded-md font-medium border border-rose-700 transition flex items-center gap-1.5 text-rose-200" title="Bersihkan memori macet">
-                    <i class="fa-solid fa-broom"></i> Reset Memori
+                <button onclick="clearSystemCache()" class="bg-rose-950/80 hover:bg-rose-900 text-xs px-3.5 py-2 rounded-lg font-medium border border-rose-800 transition flex items-center gap-2 text-rose-200">
+                    <i class="fa-solid fa-trash-can"></i> Reset Cache
                 </button>
-                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-2 rounded-md font-medium text-white transition flex items-center gap-1.5 shadow-sm">
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3.5 py-2 rounded-lg font-medium text-white transition flex items-center gap-2 shadow-sm">
                     <i class="fa-solid fa-file-excel"></i> Export Excel
                 </button>
-                <label class="bg-blue-600 hover:bg-blue-500 text-xs px-3 py-2 rounded-md font-medium text-white transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+                <label class="bg-blue-600 hover:bg-blue-500 text-xs px-3.5 py-2 rounded-lg font-medium text-white transition flex items-center gap-2 cursor-pointer shadow-sm">
                     <i class="fa-solid fa-file-arrow-up"></i> Import Excel
                     <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcel(event)">
                 </label>
@@ -51,58 +51,58 @@
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
         <!-- Notification Banner -->
-        <div id="alert-box" class="hidden p-4 rounded-lg text-sm font-medium shadow-sm transition-all duration-300"></div>
+        <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-medium shadow-md transition-all duration-300"></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- Form Input Panel -->
-            <div class="lg:col-span-1 bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                <h2 class="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square text-blue-600"></i> Form Input Data Oil
+            <div class="lg:col-span-1 bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700">
+                <h2 class="text-base font-bold text-white mb-4 pb-2 border-b border-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-blue-400"></i> Form Input Transaksi Oil
                 </h2>
                 
                 <form id="oilForm" onsubmit="handleSubmit(event)" class="space-y-3.5">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Site</label>
-                        <input type="text" id="site" required placeholder="Contoh: Site A / Plant 1" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Site (ID)</label>
+                        <input type="text" id="site" required placeholder="Contoh: BAYAN, SITE A" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Kode Unit</label>
-                        <input type="text" id="kodeUnit" required placeholder="Contoh: DT-01, EX-05" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Code Unit</label>
+                        <input type="text" id="kodeUnit" required placeholder="Contoh: DT-01, EX-05" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal</label>
-                            <input type="date" id="tanggal" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Tanggal</label>
+                            <input type="date" id="tanggal" required class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah (Liter)</label>
-                            <input type="number" step="0.01" id="jumlah" required placeholder="0.00" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Jumlah (Liter)</label>
+                            <input type="number" step="0.01" id="jumlah" required placeholder="0.00" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Oil</label>
-                            <input type="text" id="jenisOil" required placeholder="Hydraulic, Engine..." class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Jenis Oil</label>
+                            <input type="text" id="jenisOil" required placeholder="Hydraulic, Engine..." class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Type Oil</label>
-                            <input type="text" id="typeOil" required placeholder="ISO VG 46, SAE 15W40..." class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Typre Oil</label>
+                            <input type="text" id="typeOil" required placeholder="15W-40, ISO VG 46..." class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Component</label>
-                        <input type="text" id="component" required placeholder="Main Pump, Engine Block..." class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Component</label>
+                        <input type="text" id="component" required placeholder="Engine, Transmission..." class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Pengisian</label>
-                            <select id="jenisPengisian" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Jenis Pengisian</label>
+                            <select id="jenisPengisian" required class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Pilih...</option>
                                 <option value="Top Up">Top Up</option>
                                 <option value="Refill">Refill</option>
@@ -110,8 +110,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Shift</label>
-                            <select id="shift" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Shift</label>
+                            <select id="shift" required class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Pilih...</option>
                                 <option value="Shift 1">Shift 1</option>
                                 <option value="Shift 2">Shift 2</option>
@@ -122,21 +122,21 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Station</label>
-                        <input type="text" id="station" required placeholder="Station / Lokasi Kerja" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Station</label>
+                        <input type="text" id="station" required placeholder="Contoh: LS02" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Manpower</label>
-                        <input type="text" id="manpower" required placeholder="Nama Petugas / Teknisi" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Manpower</label>
+                        <input type="text" id="manpower" required placeholder="Nama Teknisi" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Problem</label>
-                        <textarea id="problem" rows="2" placeholder="Keterangan / Kendala (jika ada)" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Problem</label>
+                        <textarea id="problem" rows="2" placeholder="Keterangan / Kendala" class="w-full text-sm bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow-sm flex items-center justify-center gap-2">
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan Data
                     </button>
                 </form>
@@ -146,45 +146,45 @@
             <div class="lg:col-span-2 flex flex-col gap-4">
                 
                 <!-- Filter Section -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-3 items-end">
+                <div class="bg-slate-800 p-4 rounded-2xl shadow-xl border border-slate-700 flex flex-wrap gap-3 items-end">
                     <div class="flex-1 min-w-[140px]">
-                        <label class="block text-xs font-medium text-slate-500 mb-1">Filter Site</label>
-                        <input type="text" id="filterSite" placeholder="Cari site..." oninput="filterData()" class="w-full text-xs border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Filter Site</label>
+                        <input type="text" id="filterSite" placeholder="Cari site..." oninput="filterData()" class="w-full text-xs bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </div>
                     <div class="w-[130px]">
-                        <label class="block text-xs font-medium text-slate-500 mb-1">Dari Tanggal</label>
-                        <input type="date" id="filterStartDate" onchange="filterData()" class="w-full text-xs border border-slate-300 rounded-md px-2 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Dari Tanggal</label>
+                        <input type="date" id="filterStartDate" onchange="filterData()" class="w-full text-xs bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </div>
                     <div class="w-[130px]">
-                        <label class="block text-xs font-medium text-slate-500 mb-1">Sampai Tanggal</label>
-                        <input type="date" id="filterEndDate" onchange="filterData()" class="w-full text-xs border border-slate-300 rounded-md px-2 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Sampai Tanggal</label>
+                        <input type="date" id="filterEndDate" onchange="filterData()" class="w-full text-xs bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2.5 text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </div>
                     <div>
-                        <button onclick="resetFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3 py-2 rounded-md font-medium transition">
+                        <button onclick="resetFilter()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl font-medium transition">
                             <i class="fa-solid fa-filter-circle-xmark"></i> Reset
                         </button>
                     </div>
                 </div>
 
                 <!-- Table Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-grow flex flex-col overflow-hidden">
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-table-list text-blue-600"></i> Rekap Data Transaksi Oil
+                <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 flex-grow flex flex-col overflow-hidden">
+                    <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-blue-400"></i> Rekap Data Sheet Transaction
                         </h3>
-                        <span id="dataCount" class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full">0 Data</span>
+                        <span id="dataCount" class="text-xs bg-blue-950 text-blue-300 border border-blue-800 font-semibold px-3 py-1 rounded-full">0 Data</span>
                     </div>
 
-                    <div class="overflow-x-auto flex-grow max-h-[550px]">
+                    <div class="overflow-x-auto flex-grow max-h-[580px]">
                         <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-slate-700 sticky top-0 z-10 border-b border-slate-200">
+                            <thead class="bg-slate-900 text-slate-300 sticky top-0 z-10 border-b border-slate-700">
                                 <tr>
-                                    <th class="p-3 font-semibold">Site</th>
-                                    <th class="p-3 font-semibold">Kode Unit</th>
+                                    <th class="p-3 font-semibold">ID (Site)</th>
+                                    <th class="p-3 font-semibold">Code Unit</th>
                                     <th class="p-3 font-semibold">Tanggal</th>
                                     <th class="p-3 font-semibold">Jumlah</th>
                                     <th class="p-3 font-semibold">Jenis Oil</th>
-                                    <th class="p-3 font-semibold">Type Oil</th>
+                                    <th class="p-3 font-semibold">Typre Oil</th>
                                     <th class="p-3 font-semibold">Component</th>
                                     <th class="p-3 font-semibold">Pengisian</th>
                                     <th class="p-3 font-semibold">Shift</th>
@@ -193,7 +193,7 @@
                                     <th class="p-3 font-semibold">Problem</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-100">
+                            <tbody id="tableBody" class="divide-y divide-slate-700/50">
                                 <!-- Data rows inserted dynamically -->
                             </tbody>
                         </table>
@@ -206,14 +206,13 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 mt-6">
-        Oil Monitoring Management System &copy; 2026
+    <footer class="bg-slate-800 border-t border-slate-700 py-3 text-center text-xs text-slate-400 mt-6">
+        Oil Monitoring Pro System &copy; 2026
     </footer>
 
     <!-- Script Logic -->
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIcur1LWkK3t1cpkqc3BRtwUdVMAtowcLfHPqH9-op4XzOrY7YFWvoCQD230Aunt6j6w/exec";
-
         let allData = [];
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -223,68 +222,66 @@
         });
 
         function loadLocalData() {
-            const saved = localStorage.getItem("oil_monitoring_data_v3");
+            const saved = localStorage.getItem("oil_monitoring_pro_v1");
             if (saved) {
                 try {
                     allData = JSON.parse(saved);
                     renderTable(allData);
                 } catch (e) {
-                    console.error("Gagal parse local data", e);
+                    console.error("Local data error", e);
                 }
             }
         }
 
         function saveLocalData() {
-            localStorage.setItem("oil_monitoring_data_v3", JSON.stringify(allData));
+            localStorage.setItem("oil_monitoring_pro_v1", JSON.stringify(allData));
         }
 
-        // TOMBOL GAMPANG UNTUK BERSIHKAN MEMORI MACET
-        function clearLocalCache() {
-            if (confirm("Yakin ingin mereset memori lokal browser? Ini akan menyegarkan data agar murni mengikuti Google Spreadsheet Anda.")) {
-                localStorage.removeItem("oil_monitoring_data_v3");
-                localStorage.removeItem("oil_monitoring_data_v2");
-                localStorage.removeItem("oil_monitoring_data");
-                showAlert("Memori berhasil dibersihkan! Memuat ulang data...", "success");
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+        function clearSystemCache() {
+            if (confirm("Reset seluruh cache lokal dan muat ulang bersih dari Google Spreadsheet?")) {
+                localStorage.removeItem("oil_monitoring_pro_v1");
+                localStorage.clear();
+                showAlert("Cache dibersihkan. Memuat ulang...", "success");
+                setTimeout(() => location.reload(), 1000);
             }
         }
 
         function showAlert(message, type = "success") {
             const alertBox = document.getElementById("alert-box");
-            alertBox.className = `p-4 rounded-lg text-sm font-medium shadow-sm transition-all duration-300 ${
+            alertBox.className = `p-4 rounded-xl text-sm font-medium shadow-md transition-all duration-300 ${
                 type === "success" 
-                    ? "bg-emerald-50 text-emerald-800 border border-emerald-200" 
-                    : "bg-rose-50 text-rose-800 border border-rose-200"
+                    ? "bg-emerald-950 text-emerald-200 border border-emerald-800" 
+                    : "bg-rose-950 text-rose-200 border border-rose-800"
             }`;
-            alertBox.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-600' : 'fa-triangle-exclamation text-rose-600'}"></i> ${message}</div>`;
+            alertBox.innerHTML = `<div class="flex items-center gap-2"><i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-triangle-exclamation text-rose-400'}"></i> ${message}</div>`;
             alertBox.classList.remove("hidden");
-            setTimeout(() => {
-                alertBox.classList.add("hidden");
-            }, 4000);
+            setTimeout(() => alertBox.classList.add("hidden"), 4000);
         }
 
         async function handleSubmit(e) {
             e.preventDefault();
-            
             const submitBtn = document.getElementById("submitBtn");
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
+            // URUTAN KUNCI PAS DENGAN HEADER SPREADSHEET:
+            // 1. ID (site) | 2. CODE UNIT (kodeUnit) | 3. TANGGAL (tanggal) | 4. JUMLAH (jumlah)
+            // 5. JENIS OIL (jenisOil) | 6. TYPRE OIL (typeOil) | 7. COMPONENT (component)
+            // 8. JENIS PENGISIAN (jenisPengisian) | 9. SHIFT (shift) | 10. STATION (station)
+            // 11. MANPOWER (manpower) | 12. PROBLEM (problem)
             const newData = {
-                site: document.getElementById("site").value,
-                kodeUnit: document.getElementById("kodeUnit").value,
+                site: document.getElementById("site").value.trim(),
+                kodeUnit: document.getElementById("kodeUnit").value.trim(),
                 tanggal: document.getElementById("tanggal").value,
                 jumlah: document.getElementById("jumlah").value,
-                jenisOil: document.getElementById("jenisOil").value,
-                typeOil: document.getElementById("typeOil").value,
-                component: document.getElementById("component").value,
+                jenisOil: document.getElementById("jenisOil").value.trim(),
+                typeOil: document.getElementById("typeOil").value.trim(),
+                component: document.getElementById("component").value.trim(),
                 jenisPengisian: document.getElementById("jenisPengisian").value,
                 shift: document.getElementById("shift").value,
-                station: document.getElementById("station").value,
-                manpower: document.getElementById("manpower").value,
-                problem: document.getElementById("problem").value || "-"
+                station: document.getElementById("station").value.trim(),
+                manpower: document.getElementById("manpower").value.trim(),
+                problem: document.getElementById("problem").value.trim() || "-"
             };
 
             allData.unshift(newData);
@@ -298,13 +295,12 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(newData)
                 });
-                
-                showAlert("Data berhasil disimpan ke sistem dan Google Spreadsheet!");
+                showAlert("Data berhasil disimpan ke Spreadsheet & Sistem!");
                 document.getElementById("oilForm").reset();
                 document.getElementById("tanggal").valueAsDate = new Date();
             } catch (error) {
-                console.error("Gagal kirim ke server:", error);
-                showAlert("Data tersimpan di perangkat (Lokal), namun gagal mengirim ke cloud spreadsheet.", "error");
+                console.error(error);
+                showAlert("Tersimpan lokal, gagal mengirim ke cloud spreadsheet.", "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Simpan Data`;
@@ -316,29 +312,29 @@
             document.getElementById("dataCount").innerText = `${dataArray.length} Data`;
             
             if (dataArray.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-slate-400 italic">Belum ada data tersedia.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-500 italic">Belum ada data transaksi oil.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = dataArray.map(item => `
-                <tr class="hover:bg-slate-50/80 transition">
-                    <td class="p-3 font-medium text-slate-800">${escapeHtml(item.site)}</td>
-                    <td class="p-3 font-semibold text-slate-700">${escapeHtml(item.kodeUnit || item.kode_unit)}</td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.tanggal)}</td>
-                    <td class="p-3 font-semibold text-blue-600">${escapeHtml(item.jumlah)} L</td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.jenisOil)}</td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.typeOil)}</td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.component)}</td>
+                <tr class="hover:bg-slate-700/40 transition">
+                    <td class="p-3 font-semibold text-white">${escapeHtml(item.site)}</td>
+                    <td class="p-3 font-bold text-blue-400">${escapeHtml(item.kodeUnit || item.kode_unit)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.tanggal)}</td>
+                    <td class="p-3 font-semibold text-emerald-400">${escapeHtml(item.jumlah)} L</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.jenisOil)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.typeOil)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.component)}</td>
                     <td class="p-3">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                            item.jenisPengisian === 'Top Up' ? 'bg-amber-100 text-amber-800' :
-                            item.jenisPengisian === 'Refill' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                            item.jenisPengisian === 'Top Up' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
+                            item.jenisPengisian === 'Refill' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-purple-950 text-purple-300 border border-purple-800'
                         }">${escapeHtml(item.jenisPengisian)}</span>
                     </td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.shift)}</td>
-                    <td class="p-3 text-slate-600">${escapeHtml(item.station)}</td>
-                    <td class="p-3 text-slate-600 font-medium">${escapeHtml(item.manpower)}</td>
-                    <td class="p-3 text-slate-500 italic">${escapeHtml(item.problem)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.shift)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(item.station)}</td>
+                    <td class="p-3 text-slate-200 font-medium">${escapeHtml(item.manpower)}</td>
+                    <td class="p-3 text-slate-400 italic">${escapeHtml(item.problem)}</td>
                 </tr>
             `).join("");
         }
@@ -354,10 +350,10 @@
                     allData = result;
                     saveLocalData();
                     renderTable(allData);
-                    showAlert("Data berhasil disinkronkan dari Google Spreadsheet!");
+                    showAlert("Data tersinkronisasi dari Google Spreadsheet!");
                 }
             } catch (error) {
-                console.warn("Menggunakan data lokal karena gagal mengambil dari cloud:", error);
+                console.warn("Menggunakan data lokal.", error);
             } finally {
                 icon.classList.remove("fa-spin");
             }
@@ -375,7 +371,6 @@
                 const matchEnd = endDate ? item.tanggal <= endDate : true;
                 return matchSite && matchStart && matchEnd;
             });
-
             renderTable(filtered);
         }
 
@@ -413,28 +408,28 @@
 
                     if (json.length > 0) {
                         const imported = json.map(row => ({
-                            site: row.Site || row.site || "-",
-                            kodeUnit: row["Kode Unit"] || row.kodeUnit || row.kode_unit || "-",
-                            tanggal: row.Tanggal || row.tanggal || new Date().toISOString().split('T')[0],
-                            jumlah: row.Jumlah || row.jumlah || 0,
-                            jenisOil: row["Jenis Oil"] || row.jenisOil || "-",
-                            typeOil: row["Type Oil"] || row.typeOil || "-",
-                            component: row.Component || row.component || "-",
-                            jenisPengisian: row["Jenis Pengisian"] || row.jenisPengisian || "Top Up",
-                            shift: row.Shift || row.shift || "Shift 1",
-                            station: row.Station || row.station || "-",
-                            manpower: row.Manpower || row.manpower || "-",
-                            problem: row.Problem || row.problem || "-"
+                            site: row.ID || row.Site || row.site || "-",
+                            kodeUnit: row["CODE UNIT"] || row["Kode Unit"] || row.kodeUnit || "-",
+                            tanggal: row.TANGGAL || row.Tanggal || row.tanggal || new Date().toISOString().split('T')[0],
+                            jumlah: row.JUMLAH || row.Jumlah || row.jumlah || 0,
+                            jenisOil: row["JENIS OIL"] || row["Jenis Oil"] || row.jenisOil || "-",
+                            typeOil: row["TYPRE OIL"] || row["Type Oil"] || row.typeOil || "-",
+                            component: row.COMPONENT || row.Component || row.component || "-",
+                            jenisPengisian: row["JENIS PENGISIAN"] || row["Jenis Pengisian"] || row.jenisPengisian || "Top Up",
+                            shift: row.SHIFT || row.Shift || row.shift || "Shift 1",
+                            station: row.STATION || row.Station || row.station || "-",
+                            manpower: row.MANPOWER || row.Manpower || row.manpower || "-",
+                            problem: row.PROBLEM || row.Problem || row.problem || "-"
                         }));
 
                         allData = [...imported, ...allData];
                         saveLocalData();
                         renderTable(allData);
-                        showAlert(`Berhasil mengimpor ${imported.length} data dari file Excel!`);
+                        showAlert(`Berhasil mengimpor ${imported.length} baris data Excel!`);
                     }
                 } catch (err) {
                     console.error(err);
-                    showAlert("Gagal membaca file Excel. Pastikan format kolom sesuai.", "error");
+                    showAlert("Gagal membaca file Excel.", "error");
                 }
                 e.target.value = "";
             };
