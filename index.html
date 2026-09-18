@@ -264,11 +264,6 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
-            // URUTAN KUNCI PAS DENGAN HEADER SPREADSHEET:
-            // 1. ID (site) | 2. CODE UNIT (kodeUnit) | 3. TANGGAL (tanggal) | 4. JUMLAH (jumlah)
-            // 5. JENIS OIL (jenisOil) | 6. TYPRE OIL (typeOil) | 7. COMPONENT (component)
-            // 8. JENIS PENGISIAN (jenisPengisian) | 9. SHIFT (shift) | 10. STATION (station)
-            // 11. MANPOWER (manpower) | 12. PROBLEM (problem)
             const newData = {
                 site: document.getElementById("site").value.trim(),
                 kodeUnit: document.getElementById("kodeUnit").value.trim(),
@@ -316,27 +311,42 @@
                 return;
             }
 
-            tbody.innerHTML = dataArray.map(item => `
+            tbody.innerHTML = dataArray.map(item => {
+                // Penanganan fleksibel untuk mendeteksi berbagai variasi penamaan properti code unit dari server/local
+                const displayKodeUnit = item.kodeUnit || item.kode_unit || item["CODE UNIT"] || item["Kode Unit"] || "-";
+                const displaySite = item.site || item.ID || item.id || "-";
+                const displayTanggal = item.tanggal || item.TANGGAL || "-";
+                const displayJumlah = item.jumlah || item.JUMLAH || 0;
+                const displayJenisOil = item.jenisOil || item["JENIS OIL"] || "-";
+                const displayTypeOil = item.typeOil || item["TYPRE OIL"] || "-";
+                const displayComponent = item.component || item.COMPONENT || "-";
+                const displayPengisian = item.jenisPengisian || item["JENIS PENGISIAN"] || "-";
+                const displayShift = item.shift || item.SHIFT || "-";
+                const displayStation = item.station || item.STATION || "-";
+                const displayManpower = item.manpower || item.MANPOWER || "-";
+                const displayProblem = item.problem || item.PROBLEM || "-";
+
+                return `
                 <tr class="hover:bg-slate-700/40 transition">
-                    <td class="p-3 font-semibold text-white">${escapeHtml(item.site)}</td>
-                    <td class="p-3 font-bold text-blue-400">${escapeHtml(item.kodeUnit || item.kode_unit)}</td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.tanggal)}</td>
-                    <td class="p-3 font-semibold text-emerald-400">${escapeHtml(item.jumlah)} L</td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.jenisOil)}</td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.typeOil)}</td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.component)}</td>
+                    <td class="p-3 font-semibold text-white">${escapeHtml(displaySite)}</td>
+                    <td class="p-3 font-bold text-blue-400">${escapeHtml(displayKodeUnit)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(displayTanggal)}</td>
+                    <td class="p-3 font-semibold text-emerald-400">${escapeHtml(displayJumlah)} L</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(displayJenisOil)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(displayTypeOil)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(displayComponent)}</td>
                     <td class="p-3">
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                            item.jenisPengisian === 'Top Up' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
-                            item.jenisPengisian === 'Refill' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-purple-950 text-purple-300 border border-purple-800'
-                        }">${escapeHtml(item.jenisPengisian)}</span>
+                            displayPengisian === 'Top Up' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
+                            displayPengisian === 'Refill' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-purple-950 text-purple-300 border border-purple-800'
+                        }">${escapeHtml(displayPengisian)}</span>
                     </td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.shift)}</td>
-                    <td class="p-3 text-slate-300">${escapeHtml(item.station)}</td>
-                    <td class="p-3 text-slate-200 font-medium">${escapeHtml(item.manpower)}</td>
-                    <td class="p-3 text-slate-400 italic">${escapeHtml(item.problem)}</td>
-                </tr>
-            `).join("");
+                    <td class="p-3 text-slate-300">${escapeHtml(displayShift)}</td>
+                    <td class="p-3 text-slate-300">${escapeHtml(displayStation)}</td>
+                    <td class="p-3 text-slate-200 font-medium">${escapeHtml(displayManpower)}</td>
+                    <td class="p-3 text-slate-400 italic">${escapeHtml(displayProblem)}</td>
+                </tr>`;
+            }).join("");
         }
 
         async function refreshData() {
@@ -365,10 +375,11 @@
             const endDate = document.getElementById("filterEndDate").value;
 
             const filtered = allData.filter(item => {
-                const siteVal = (item.site || "").toLowerCase();
+                const siteVal = (item.site || item.ID || "").toLowerCase();
                 const matchSite = siteVal.includes(siteQuery);
-                const matchStart = startDate ? item.tanggal >= startDate : true;
-                const matchEnd = endDate ? item.tanggal <= endDate : true;
+                const tgl = item.tanggal || item.TANGGAL || "";
+                const matchStart = startDate ? tgl >= startDate : true;
+                const matchEnd = endDate ? tgl <= endDate : true;
                 return matchSite && matchStart && matchEnd;
             });
             renderTable(filtered);
@@ -409,7 +420,7 @@
                     if (json.length > 0) {
                         const imported = json.map(row => ({
                             site: row.ID || row.Site || row.site || "-",
-                            kodeUnit: row["CODE UNIT"] || row["Kode Unit"] || row.kodeUnit || "-",
+                            kodeUnit: row["CODE UNIT"] || row["Kode Unit"] || row.kodeUnit || row.kode_unit || "-",
                             tanggal: row.TANGGAL || row.Tanggal || row.tanggal || new Date().toISOString().split('T')[0],
                             jumlah: row.JUMLAH || row.Jumlah || row.jumlah || 0,
                             jenisOil: row["JENIS OIL"] || row["Jenis Oil"] || row.jenisOil || "-",
