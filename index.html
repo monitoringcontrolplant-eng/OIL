@@ -33,6 +33,9 @@
                 <button onclick="refreshData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-md font-medium border border-slate-700 transition flex items-center gap-1.5">
                     <i class="fa-solid fa-rotate text-blue-400" id="refresh-icon"></i> Refresh Data
                 </button>
+                <button onclick="clearLocalCache()" class="bg-rose-900/60 hover:bg-rose-800 text-xs px-3 py-2 rounded-md font-medium border border-rose-700 transition flex items-center gap-1.5 text-rose-200" title="Bersihkan memori macet">
+                    <i class="fa-solid fa-broom"></i> Reset Memori
+                </button>
                 <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-2 rounded-md font-medium text-white transition flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-file-excel"></i> Export Excel
                 </button>
@@ -220,7 +223,7 @@
         });
 
         function loadLocalData() {
-            const saved = localStorage.getItem("oil_monitoring_data_v2");
+            const saved = localStorage.getItem("oil_monitoring_data_v3");
             if (saved) {
                 try {
                     allData = JSON.parse(saved);
@@ -232,7 +235,20 @@
         }
 
         function saveLocalData() {
-            localStorage.setItem("oil_monitoring_data_v2", JSON.stringify(allData));
+            localStorage.setItem("oil_monitoring_data_v3", JSON.stringify(allData));
+        }
+
+        // TOMBOL GAMPANG UNTUK BERSIHKAN MEMORI MACET
+        function clearLocalCache() {
+            if (confirm("Yakin ingin mereset memori lokal browser? Ini akan menyegarkan data agar murni mengikuti Google Spreadsheet Anda.")) {
+                localStorage.removeItem("oil_monitoring_data_v3");
+                localStorage.removeItem("oil_monitoring_data_v2");
+                localStorage.removeItem("oil_monitoring_data");
+                showAlert("Memori berhasil dibersihkan! Memuat ulang data...", "success");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
         }
 
         function showAlert(message, type = "success") {
