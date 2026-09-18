@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Oil Monitoring - Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 h-full flex flex-col">
+
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl text-xl shadow-md">🛢️</div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight">OIL MONITORING MANAGEMENT</h1>
+                    <p class="text-xs text-slate-400">Sheet Target: <span class="text-blue-400 font-mono">Transaction</span></p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button onclick="fetchSheetData()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-2 border border-slate-700">
+                    🔄 Refresh Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        <!-- Form Input Section matching Spreadsheet Columns -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">📝</span>
+                        <h2 class="text-base font-bold text-slate-800">Form Input Transaction</h2>
+                    </div>
+                </div>
+                
+                <form id="oilForm" onsubmit="handleSubmit(event)" class="space-y-4 text-xs">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Site</label>
+                            <input type="text" id="inputSite" placeholder="Contoh: Site A / HQ" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Unit</label>
+                            <input type="text" id="inputUnit" placeholder="Contoh: DT-8801" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Tanggal</label>
+                            <input type="date" id="inputTanggal" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Jumlah (Liter)</label>
+                            <input type="number" step="0.1" id="inputJumlah" placeholder="0.0" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Jenis Oil</label>
+                            <input type="text" id="inputJenisOil" placeholder="Hydraulic / Engine" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Type Oil</label>
+                            <input type="text" id="inputTypreOil" placeholder="Shell Tellus 68" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Component</label>
+                            <input type="text" id="inputComponent" placeholder="Main Pump / Final Drive" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Jenis Pengisian</label>
+                            <select id="inputJenisPengisian" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                <option value="Top Up">Top Up (Penambahan)</option>
+                                <option value="Full Change">Full Change (Penggantian)</option>
+                                <option value="Initial Fill">Initial Fill</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Shift</label>
+                            <select id="inputShift" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Shift 1">Shift 1</option>
+                                <option value="Shift 2">Shift 2</option>
+                                <option value="Shift 3">Shift 3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Station</label>
+                            <input type="text" id="inputStation" placeholder="Pit / Workshop" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold uppercase text-slate-500 mb-1">Manpower</label>
+                            <input type="text" id="inputManpower" placeholder="Nama Mekanik" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-500 mb-1">Problem / Catatan Kendala</label>
+                        <textarea id="inputProblem" rows="2" placeholder="Tuliskan kendala atau normal operation..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-blue-200 text-xs tracking-wide uppercase">
+                        Simpan & Kirim ke Spreadsheet
+                    </button>
+                </form>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+                <p class="text-[11px] text-slate-400">🛡️ Auto-backup LocalStorage aktif (Anti-hilang saat Refresh F5)</p>
+            </div>
+        </section>
+
+        <!-- Management Log & Filter Section -->
+        <section class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col">
+            <div class="flex flex-col gap-4 mb-5 pb-3 border-b border-slate-100">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">📊 Management Transaction Log</h2>
+                        <p class="text-xs text-slate-500">Seluruh rekaman pengisian oli unit operasional</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap cursor-pointer shadow-sm">
+                            📁 Upload Excel
+                            <input type="file" id="excelFile" accept=".csv, .xlsx, .xls" onchange="handleFileUpload(event)" class="hidden">
+                        </label>
+
+                        <button onclick="exportToExcel()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap">
+                            📥 Download Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Controls Panel -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs items-end">
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-500 mb-1">Filter Site</label>
+                        <select id="filterSite" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Site</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-500 mb-1">Dari Tanggal</label>
+                        <input type="date" id="filterStartDate" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-500 mb-1">Sampai Tanggal</label>
+                        <input type="date" id="filterEndDate" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="searchBox" onkeyup="applyFilters()" placeholder="Cari unit/manpower..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg font-medium transition whitespace-nowrap" title="Reset Filter">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-x-auto min-h-[350px]">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-slate-50 border-y border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                            <th class="py-3 px-3">SITE</th>
+                            <th class="py-3 px-3">UNIT</th>
+                            <th class="py-3 px-3">TANGGAL</th>
+                            <th class="py-3 px-3">JUMLAH</th>
+                            <th class="py-3 px-3">JENIS OIL</th>
+                            <th class="py-3 px-3">TYPRE OIL</th>
+                            <th class="py-3 px-3">COMPONENT</th>
+                            <th class="py-3 px-3">PENGISIAN</th>
+                            <th class="py-3 px-3">SHIFT</th>
+                            <th class="py-3 px-3">STATION</th>
+                            <th class="py-3 px-3">MANPOWER</th>
+                            <th class="py-3 px-3">PROBLEM</th>
+                            <th class="py-3 px-3 text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="oilTableBody" class="text-xs text-slate-700 divide-y divide-slate-100">
+                        <!-- Dynamic rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty state -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-center">
+                <div class="text-4xl mb-2">📂</div>
+                <p class="text-sm font-semibold text-slate-700">Tidak ada data transaksi yang cocok dengan filter</p>
+                <p class="text-xs text-slate-400 mt-1">Coba ubah parameter filter atau input data baru.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs flex items-center gap-2.5 border border-slate-800">
+        <span id="toastIcon">✅</span>
+        <span id="toastMsg">Berhasil menyimpan data</span>
+    </div>
+
+    <!-- SheetJS for Excel Reading Support -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        let oilRecords = [];
+        let sheetConfigUrl = 'https://script.google.com/macros/s/AKfycbyRfzuRXSVG9_HGwhh3-KNTeXIIjfx4jczmyv3Ti5chzVVHzVt_KH_r3Y6evsCrCD4yuA/exec';
+
+        // Load data on startup
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inputTanggal').value = today;
+
+            const savedData = localStorage.getItem('oil_management_records');
+            if (savedData) {
+                try {
+                    oilRecords = JSON.parse(savedData);
+                } catch(e) {
+                    oilRecords = [];
+                }
+            }
+
+            populateSiteDropdown();
+            renderTable();
+            fetchSheetData();
+        };
+
+        function handleSubmit(e) {
+            e.preventDefault();
+
+            const newRecord = {
+                id: 'TX-' + Date.now(),
+                site: document.getElementById('inputSite').value.trim(),
+                unit: document.getElementById('inputUnit').value.trim(),
+                tanggal: document.getElementById('inputTanggal').value,
+                jumlah: document.getElementById('inputJumlah').value,
+                jenisOil: document.getElementById('inputJenisOil').value.trim(),
+                typreOil: document.getElementById('inputTypreOil').value.trim(),
+                component: document.getElementById('inputComponent').value.trim(),
+                jenisPengisian: document.getElementById('inputJenisPengisian').value,
+                shift: document.getElementById('inputShift').value,
+                station: document.getElementById('inputStation').value.trim(),
+                manpower: document.getElementById('inputManpower').value.trim(),
+                problem: document.getElementById('inputProblem').value.trim() || '-'
+            };
+
+            oilRecords.unshift(newRecord);
+            saveToStorage();
+            populateSiteDropdown();
+            applyFilters();
+
+            // Reset form fields except date
+            document.getElementById('inputSite').value = '';
+            document.getElementById('inputUnit').value = '';
+            document.getElementById('inputJumlah').value = '';
+            document.getElementById('inputJenisOil').value = '';
+            document.getElementById('inputTypreOil').value = '';
+            document.getElementById('inputComponent').value = '';
+            document.getElementById('inputStation').value = '';
+            document.getElementById('inputManpower').value = '';
+            document.getElementById('inputProblem').value = '';
+
+            showToast('Data berhasil disimpan lokal & dikirim ke Spreadsheet!');
+            syncToAppsScript(newRecord);
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('oil_management_records', JSON.stringify(oilRecords));
+        }
+
+        function populateSiteDropdown() {
+            const siteSelect = document.getElementById('filterSite');
+            const currentSelected = siteSelect.value;
+            
+            const uniqueSites = [...new Set(oilRecords.map(r => r.site))].filter(Boolean).sort();
+            
+            siteSelect.innerHTML = '<option value="">Semua Site</option>';
+            uniqueSites.forEach(site => {
+                const opt = document.createElement('option');
+                opt.value = site;
+                opt.textContent = site;
+                if (site === currentSelected) opt.selected = true;
+                siteSelect.appendChild(opt);
+            });
+        }
+
+        function applyFilters() {
+            const siteFilter = document.getElementById('filterSite').value.toLowerCase();
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const query = document.getElementById('searchBox').value.toLowerCase();
+
+            const filtered = oilRecords.filter(r => {
+                const matchSite = !siteFilter || r.site.toLowerCase() === siteFilter;
+                
+                let matchDate = true;
+                if (startDate && r.tanggal < startDate) matchDate = false;
+                if (endDate && r.tanggal > endDate) matchDate = false;
+
+                const matchQuery = !query || 
+                    r.unit.toLowerCase().includes(query) || 
+                    r.manpower.toLowerCase().includes(query) ||
+                    r.jenisOil.toLowerCase().includes(query) ||
+                    r.component.toLowerCase().includes(query) ||
+                    r.station.toLowerCase().includes(query);
+
+                return matchSite && matchDate && matchQuery;
+            });
+
+            renderTable(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterSite').value = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('searchBox').value = '';
+            renderTable(oilRecords);
+            showToast('Filter direset');
+        }
+
+        function renderTable(dataToRender = oilRecords) {
+            const tbody = document.getElementById('oilTableBody');
+            const emptyState = document.getElementById('emptyState');
+            tbody.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            } else {
+                emptyState.classList.remove('flex');
+                emptyState.classList.add('hidden');
+            }
+
+            dataToRender.forEach((record) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition border-b border-slate-100 text-xs';
+                
+                let badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200';
+                if(record.jenisPengisian === 'Full Change') badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200';
+                if(record.jenisPengisian === 'Initial Fill') badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-bold text-slate-800">${escapeHtml(record.site)}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-900">${escapeHtml(record.unit)}</td>
+                    <td class="py-3 px-3 text-slate-500">${formatDate(record.tanggal)}</td>
+                    <td class="py-3 px-3 font-bold text-slate-900">${record.jumlah} L</td>
+                    <td class="py-3 px-3 text-slate-700">${escapeHtml(record.jenisOil)}</td>
+                    <td class="py-3 px-3 text-slate-600">${escapeHtml(record.typreOil)}</td>
+                    <td class="py-3 px-3 text-slate-700">${escapeHtml(record.component)}</td>
+                    <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md font-medium text-[10px] ${badgeColor}">${escapeHtml(record.jenisPengisian)}</span></td>
+                    <td class="py-3 px-3 text-slate-600">${escapeHtml(record.shift)}</td>
+                    <td class="py-3 px-3 text-slate-600">${escapeHtml(record.station)}</td>
+                    <td class="py-3 px-3 font-medium text-slate-800">${escapeHtml(record.manpower)}</td>
+                    <td class="py-3 px-3 text-slate-500 max-w-xs truncate" title="${escapeHtml(record.problem)}">${escapeHtml(record.problem)}</td>
+                    <td class="py-3 px-3 text-center whitespace-nowrap">
+                        <button onclick="deleteRecord('${record.id}')" class="text-rose-500 hover:text-rose-700 font-medium px-2 py-1 rounded hover:bg-rose-50 transition">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data transaksi ini?')) {
+                oilRecords = oilRecords.filter(r => r.id !== id);
+                saveToStorage();
+                populateSiteDropdown();
+                applyFilters();
+                showToast('Data berhasil dihapus');
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return isNaN(d) ? dateStr : d.toLocaleDateString('id-ID', { dateStyle: 'medium' });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        async function syncToAppsScript(record) {
+            try {
+                await fetch(sheetConfigUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(record)
+                });
+            } catch (err) {
+                console.error("Gagal sinkronisasi otomatis ke spreadsheet", err);
+            }
+        }
+
+        async function fetchSheetData() {
+            showToast('Menyinkronkan data dari Spreadsheet...');
+            try {
+                const response = await fetch(sheetConfigUrl);
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    showToast('Data berhasil diperbarui dari Spreadsheet!');
+                }
+            } catch (err) {
+                console.log("Menggunakan data lokal terkini.");
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonSheet = XLSX.utils.sheet_to_json(worksheet);
+
+                    let importedCount = 0;
+                    jsonSheet.forEach(row => {
+                        const newRec = {
+                            id: 'TX-' + Math.random().toString(36).substring(2, 9),
+                            site: String(row['SITE'] || row['site'] || 'Site Default'),
+                            unit: String(row['UNIT'] || row['unit'] || '-'),
+                            tanggal: String(row['TANGGAL'] || row['tanggal'] || new Date().toISOString().split('T')[0]),
+                            jumlah: row['JUMLAH'] || row['jumlah'] || 0,
+                            jenisOil: String(row['JENIS OIL'] || row['jenisOil'] || '-'),
+                            typreOil: String(row['TYPRE OIL'] || row['typreOil'] || '-'),
+                            component: String(row['COMPONENT'] || row['component'] || '-'),
+                            jenisPengisian: String(row['JENIS PENGISIAN'] || row['jenisPengisian'] || 'Top Up'),
+                            shift: String(row['SHIFT'] || row['shift'] || 'Shift 1'),
+                            station: String(row['STATION'] || row['station'] || '-'),
+                            manpower: String(row['MANPOWER'] || row['manpower'] || '-'),
+                            problem: String(row['PROBLEM'] || row['problem'] || '-')
+                        };
+                        oilRecords.unshift(newRec);
+                        importedCount++;
+                        syncToAppsScript(newRec);
+                    });
+
+                    saveToStorage();
+                    populateSiteDropdown();
+                    applyFilters();
+                    showToast('Berhasil mengimpor ' + importedCount + ' data & kirim ke Spreadsheet!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Gagal membaca file Excel/CSV.');
+                }
+                event.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportToExcel() {
+            if (oilRecords.length === 0) {
+                showToast('Tidak ada data untuk di-export');
+                return;
+            }
+
+            const exportData = oilRecords.map(r => ({
+                "SITE": r.site,
+                "UNIT": r.unit,
+                "TANGGAL": r.tanggal,
+                "JUMLAH": r.jumlah,
+                "JENIS OIL": r.jenisOil,
+                "TYPRE OIL": r.typreOil,
+                "COMPONENT": r.component,
+                "JENIS PENGISIAN": r.jenisPengisian,
+                "SHIFT": r.shift,
+                "STATION": r.station,
+                "MANPOWER": r.manpower,
+                "PROBLEM": r.problem
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Transaction");
+            XLSX.writeFile(workbook, "Transaction_Oil_Monitoring.xlsx");
+            showToast('File Excel berhasil di-download!');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(function() {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
